@@ -49,4 +49,4 @@ proc antiSandbox*(): bool =
     if dbg1 or dbg2:
         heuristic += 1
 
-    return heuristic > 1 # at least 1 heuristic must be true / This could be improved
+    return heuristic > 0 # at least 1 heuristic must be true / This could be improved
