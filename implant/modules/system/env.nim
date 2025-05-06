@@ -9,7 +9,8 @@ proc env*() : string =
         var keyPadded : string
 
         try:
-            keyPadded = key & obf(" ").repeat(30-key.len)
+            let padLength = max(0, 30 - key.len)
+            keyPadded = key & obf(" ").repeat(padLength)
         except:
             keyPadded = key
             
