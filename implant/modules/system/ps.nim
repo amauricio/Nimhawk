@@ -32,7 +32,8 @@ proc ps*(): string =
             procNamePadded : string
 
         try:
-            procNamePadded = procName & obf(" ").repeat(30-procname.len)
+            let padLength = max(0, 30 - procName.len)
+            procNamePadded = procName & obf(" ").repeat(padLength)
         except:
             procNamePadded = procName
 

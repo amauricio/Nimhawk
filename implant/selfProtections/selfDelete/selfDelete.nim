@@ -1,8 +1,7 @@
 import ../../util/strenc
 from winim import PathFileExistsW
 from winim/lean import HINSTANCE, DWORD, LPVOID, WCHAR, PWCHAR, LPWSTR, HANDLE, NULL, TRUE, WINBOOL, MAX_PATH
-from winim/lean import DEL
-ETE, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, FILE_DISPOSITION_INFO, INVALID_HANDLE_VALUE
+from winim/lean import DELETE, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, FILE_DISPOSITION_INFO, INVALID_HANDLE_VALUE
 from winim/lean import CreateFileW, RtlSecureZeroMemory, RtlCopyMemory, SetFileInformationByHandle, GetModuleFileNameW, CloseHandle
 
 type
