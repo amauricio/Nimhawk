@@ -2,7 +2,7 @@ import winim/core
 from strutils import join, split, startsWith, replace, toUpperAscii
 
 # Query or modify the Windows registry
-proc reg*(args : varargs[string]) : string =
+proc reg*(args : seq[string]) : string =
     # Local variables with explicit types
     var
         command: string

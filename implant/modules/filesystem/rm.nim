@@ -2,7 +2,7 @@ from os import dirExists, removeDir, removeFile
 from strutils import join
 
 # Remove a system file or folder
-proc rm*(args : varargs[string]) : string =
+proc rm*(args : seq[string]) : string =
     var path = args.join(obf(" "))
 
     if path == "":

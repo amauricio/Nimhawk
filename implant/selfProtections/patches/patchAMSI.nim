@@ -1,5 +1,5 @@
 import winim/lean
-import dynlib
+import std/dynlib
 import ../../util/strenc
 
 # Patch AMSI to stop dotnet and unmanaged powershell buffers from being scanned

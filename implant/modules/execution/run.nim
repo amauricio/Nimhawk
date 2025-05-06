@@ -1,7 +1,7 @@
 import osproc
 
 # Execute a binary as a subprocess and return output
-proc run*(args : varargs[string]) : string =
+proc run*(args : seq[string]) : string =
 
     var 
         target : string

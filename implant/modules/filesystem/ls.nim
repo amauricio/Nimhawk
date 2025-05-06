@@ -4,7 +4,7 @@ from strutils import strip, repeat, join
 from math import round
 
 # List files in the target directory
-proc ls*(args : varargs[string]) : string =
+proc ls*(args : seq[string]) : string =
     var 
         lsPath = args.join(obf(" "))
         path : string

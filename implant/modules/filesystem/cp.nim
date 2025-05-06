@@ -4,7 +4,7 @@ from strutils import join
 from winim/lean import CopyFileA, LPCSTR, FALSE, winstrConverterStringToPtrChar
 
 # Copy files or directories
-proc cp*(args : varargs[string]) : string =
+proc cp*(args : seq[string]) : string =
     var
         source : string
         destination : string

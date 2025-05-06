@@ -1,5 +1,5 @@
 import winim/lean
-import dynlib
+import std/dynlib
 import ../../util/strenc
 
 # Patch ETW to stop event tracing

@@ -17,6 +17,7 @@ bin/
 config.toml
 server/downloads/
 server/logs/
+server/venv/
 server/uploads/
 target/
 dev_utils/execute_assembly_net48_test/obj/*

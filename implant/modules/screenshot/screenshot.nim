@@ -7,7 +7,7 @@ import pixie
 import zippy
 
 # Take a screenshot of the user's desktop and send it back as an encoded string
-proc screenshot*(args : varargs[string]) : string =
+proc screenshot*(args : seq[string]) : string =
     # Get the size of the main screen
     var screenRectangle : windef.Rect
     GetClientRect(GetDesktopWindow(), addr screenRectangle)

@@ -3,7 +3,7 @@ from ../../util/winUtils import moveDir
 from strutils import join
 
 # Move a file or directory
-proc mv*(args : varargs[string]) : string =
+proc mv*(args : seq[string]) : string =
     var
         source : string
         destination : string
