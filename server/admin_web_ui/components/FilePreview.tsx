@@ -95,36 +95,64 @@ const FileThumbnail = ({ fileName, fileType, imageBlob, pdfBlob, fileContent }: 
       
     default:
       // Specific icon according to extension
-      let IconComponent = FaFile;
-      let iconColor = theme.colors.gray[5];
-      let extensionLabel = extension.toUpperCase();
+      type ExtensionRule = {
+        match: (ext: string) => boolean;
+        icon: React.ComponentType;
+        color: string;
+      };
       
-      // Determine icon and color according to extension
-      if (['js', 'ts', 'jsx', 'tsx'].includes(extension)) {
-        IconComponent = FaFileCode;
-        iconColor = "#f1c40f";
-      } else if (['html', 'xml', 'css'].includes(extension)) {
-        IconComponent = FaFileCode;
-        iconColor = "#3498db";
-      } else if (['json', 'yaml', 'yml'].includes(extension)) {
-        IconComponent = FaFileCode;
-        iconColor = "#2ecc71";
-      } else if (['py', 'rb', 'java', 'c', 'cpp', 'cs'].includes(extension)) {
-        IconComponent = FaFileCode;
-        iconColor = "#9b59b6";
-      } else if (['db', 'sqlite', 'mdb'].includes(extension)) {
-        IconComponent = FaDatabase;
-        iconColor = "#34495e";
-      } else if (['xlsx', 'xls', 'csv'].includes(extension)) {
-        IconComponent = extension === 'csv' ? FaFileCsv : FaFileExcel;
-        iconColor = "#27ae60";
-      } else if (['docx', 'doc', 'rtf'].includes(extension)) {
-        IconComponent = FaFileWord;
-        iconColor = "#2980b9";
-      } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension)) {
-        IconComponent = FaFileArchive;
-        iconColor = "#795548";
-      }
+      const extensionRules: ExtensionRule[] = [
+        {
+          match: ext => ['js', 'ts', 'jsx', 'tsx'].includes(ext),
+          icon: FaFileCode,
+          color: "#f1c40f",
+        },
+        {
+          match: ext => ['html', 'xml', 'css'].includes(ext),
+          icon: FaFileCode,
+          color: "#3498db",
+        },
+        {
+          match: ext => ['json', 'yaml', 'yml'].includes(ext),
+          icon: FaFileCode,
+          color: "#2ecc71",
+        },
+        {
+          match: ext => ['py', 'rb', 'java', 'c', 'cpp', 'cs'].includes(ext),
+          icon: FaFileCode,
+          color: "#9b59b6",
+        },
+        {
+          match: ext => ['db', 'sqlite', 'mdb'].includes(ext),
+          icon: FaDatabase,
+          color: "#34495e",
+        },
+        {
+          match: ext => ['xlsx', 'xls'].includes(ext),
+          icon: FaFileExcel,
+          color: "#27ae60",
+        },
+        {
+          match: ext => ext === 'csv',
+          icon: FaFileCsv,
+          color: "#27ae60",
+        },
+        {
+          match: ext => ['docx', 'doc', 'rtf'].includes(ext),
+          icon: FaFileWord,
+          color: "#2980b9",
+        },
+        {
+          match: ext => ['zip', 'rar', '7z', 'tar', 'gz'].includes(ext),
+          icon: FaFileArchive,
+          color: "#795548",
+        },
+      ];
+      
+      const rule = extensionRules.find(r => r.match(extension));
+      const IconComponent = rule?.icon || FaFile;
+      const iconColor = rule?.color || theme.colors.gray[5];
+      const extensionLabel = extension.toUpperCase();
       
       return (
         <Box style={{ textAlign: 'center', width: '100%' }}>

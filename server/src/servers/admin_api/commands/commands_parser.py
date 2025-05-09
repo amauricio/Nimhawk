@@ -9,9 +9,15 @@ from src.servers.admin_api.models.nimplant_client_model import NimPlant
 import src.config.db as db
 import src.util.utils as utils
 import src.util.time as utils_time
+import os
 
 def get_commands():
     with open("src/servers/admin_api/commands/commands.yaml", "r", encoding="UTF-8") as f:
+        #get current directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        #get commands.yaml file
+        commands_file = os.path.join(current_dir, "commands.yaml")
+        print(f"Commands file: {commands_file}")
         return sorted(yaml.load(f, Loader=FullLoader), key=lambda c: c["command"])
 
 

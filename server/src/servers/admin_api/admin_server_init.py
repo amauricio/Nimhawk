@@ -697,10 +697,8 @@ def admin_server():
             if flask.request.method == "POST":
                 data = flask.request.get_json()
                 if data:
-                    if "debug" in data:
-                        debug = data["debug"]
-                    if "workspace" in data:
-                        workspace = data["workspace"]
+                    debug = data.get("debug", False)
+                    workspace = data.get("workspace", None)
             
             # Generate a unique ID for this build
             build_id = str(uuid.uuid4())
@@ -976,6 +974,7 @@ def admin_server():
             import traceback
             utils.nimplant_print(f"DEBUG: /api/server - Traceback: {traceback.format_exc()}")
             return flask.jsonify({"error": "Internal server error"}), 500
+    
 
     # Get the last X lines of console history
     @app.route("/api/server/console", methods=["GET"])

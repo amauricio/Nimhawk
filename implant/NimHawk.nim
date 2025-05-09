@@ -39,6 +39,7 @@ when defined selfdelete:
 var riskyMode = false
 when defined risky:
     riskyMode = true
+    
 
 # Parse the configuration at compile-time
 let CONFIG : Table[string, string] = configParser.parseConfig()

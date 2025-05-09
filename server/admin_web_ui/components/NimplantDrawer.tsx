@@ -205,18 +205,17 @@ const NimplantContent = memo(({ guid, onClose, opened, onKilled }: { guid: strin
         const totalMinutes = Math.floor(totalSeconds / 60);
         const totalHours = Math.floor(totalMinutes / 60);
         const days = Math.floor(totalHours / 24);
+
+        const timeFormats = [
+          { value: days, singular: 'day', plural: 'days' },
+          { value: totalHours, singular: 'hour', plural: 'hours' },
+          { value: totalMinutes, singular: 'minute', plural: 'minutes' },
+        ];
         
-        let timeString;
-        
-        if (days > 0) {
-          timeString = days === 1 ? '1 day ago' : `${days} days ago`;
-        } else if (totalHours > 0) {
-          timeString = totalHours === 1 ? '1 hour ago' : `${totalHours} hours ago`;
-        } else if (totalMinutes > 0) {
-          timeString = totalMinutes === 1 ? '1 minute ago' : `${totalMinutes} minutes ago`;
-        } else {
-          timeString = 'less than a minute ago';
-        }
+        const format = timeFormats.find(t => t.value > 0);
+        const timeString = format
+          ? `${format.value} ${format.value === 1 ? format.singular : format.plural} ago`
+          : 'less than a minute ago';
         
         console.log(`[${currentGuid}] Manually calculated time:`, timeString);
         setLastSeenText(timeString);
@@ -224,17 +223,14 @@ const NimplantContent = memo(({ guid, onClose, opened, onKilled }: { guid: strin
         // If date format doesn't match expected pattern, fall back to status
         console.log(`[${currentGuid}] Date format doesn't match expected pattern`);
         
-        if (nimplantInfo.active) {
-          if (nimplantInfo.disconnected) {
-            setLastSeenText('more than 5 minutes ago');
-          } else if (nimplantInfo.late) {
-            setLastSeenText('about 5 minutes ago');
-          } else {
-            setLastSeenText('less than 1 minute ago');
-          }
-        } else {
-          setLastSeenText('Unknown');
-        }
+        const getLastSeenText = (info: NimplantInfo) => {
+          if (!info.active) return 'Unknown';
+          if (info.disconnected) return 'more than 5 minutes ago';
+          if (info.late) return 'about 5 minutes ago';
+          return 'less than 1 minute ago';
+        };
+        
+        setLastSeenText(getLastSeenText(nimplantInfo));
       }
     } catch (error) {
       console.error(`[${currentGuid}] Error processing lastCheckin:`, error);
